@@ -1,6 +1,0 @@
-email,wallet_address,amount,crypto_symbol,network,description
-john.doe@example.com,0x742d35Cc6634C0532925a3b8D66C2dDc168E7d8f,100.00,USDC,Ethereum,Q4 Performance Bonus
-jane.smith@example.com,0x8ba1f109551bD432803012645Hac136c5a765a13,250.50,USDT,Ethereum,Sales Target Achievement
-bob.wilson@example.com,0x1234567890abcdef1234567890abcdef12345678,75.25,USDC,Polygon,Project Completion Bonus
-alice.johnson@example.com,0xabcdef1234567890abcdef1234567890abcdef12,500.00,ETH,Ethereum,Innovation Award
-mike.davis@example.com,0x9876543210fedcba9876543210fedcba98765432,150.75,USDT,Polygon,Customer Service Excellence 

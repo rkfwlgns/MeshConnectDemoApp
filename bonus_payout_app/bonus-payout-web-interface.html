@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bonus Payment Interface - MeshConnect</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 120px;
+            resize: vertical;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn-success {
+            background-color: #28a745;
+        }
+        .btn-success:hover {
+            background-color: #1e7e34;
+        }
+        .btn:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .instructions {
+            background-color: #e7f3ff;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .code {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .mesh-interface {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 2px solid #007bff;
+        }
+        .mesh-iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 8px;
+            background-color: white;
+        }
+        .hidden {
+            display: none;
+        }
+        .workflow {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Bonus Payment Interface</h1>
+            <p>Complete employee bonus payments using MeshConnect & Coinbase</p>
+        </div>
+
+        <div class="workflow">
+            <h3>📋 Bonus Payment Workflow:</h3>
+            <ol>
+                <li><strong>Run Bonus App:</strong> Execute <code class="code">./bonus-payout.sh</code></li>
+                <li><strong>Choose Payment Type:</strong> Select option 3 (Single Payout) or 4 (Batch Payouts)</li>
+                <li><strong>Enter Details:</strong> Provide employee email, wallet address, amount, and currency</li>
+                <li><strong>Copy Link Token:</strong> Copy the generated link token from the terminal</li>
+                <li><strong>Complete Payment:</strong> Paste token below and use MeshConnect to pay via Coinbase</li>
+            </ol>
+        </div>
+
+        <div class="instructions">
+            <h3>🚀 Quick Start Guide:</h3>
+            <p><strong>Step 1:</strong> Open terminal and run the bonus payout application:</p>
+            <div class="code">./bonus-payout.sh</div>
+            
+            <p><strong>Step 2:</strong> From the main menu, select:</p>
+            <ul>
+                <li><strong>Option 3:</strong> Process Single Bonus Payout</li>
+                <li><strong>Option 4:</strong> Process Batch Bonus Payouts (CSV file)</li>
+            </ul>
+            
+            <p><strong>Step 3:</strong> Enter the required information:</p>
+            <ul>
+                <li>Employee email address</li>
+                <li>Wallet address (Ethereum/Polygon/BSC)</li>
+                <li>Bonus amount</li>
+                <li>Currency (USDC, USDT, ETH, BTC)</li>
+                <li>Network selection</li>
+                <li>Payment description</li>
+            </ul>
+            
+            <p><strong>Step 4:</strong> Copy the link token and paste it below to complete the payment.</p>
+        </div>
+
+        <div class="form-group">
+            <label for="linkToken">Link Token (from bonus-payout.sh):</label>
+            <textarea id="linkToken" placeholder="After running ./bonus-payout.sh and creating a payout, paste the generated link token here..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <button class="btn btn-success" id="processBtn" onclick="processPayment()">💳 Complete Bonus Payment</button>
+            <button class="btn" onclick="clearAll()">🗑️ Clear All</button>
+            <button class="btn" onclick="readPortfolio()">📊 View Portfolio</button>
+            <button class="btn" onclick="testConnection()">🧪 Test Connection</button>
+            <button class="btn" onclick="showHelp()">❓ Help</button>
+        </div>
+
+        <div id="status"></div>
+
+        <!-- MeshConnect Interface -->
+        <div id="meshInterface" class="mesh-interface hidden">
+            <div style="text-align: center; margin-bottom: 15px;">
+                <h3>🔗 MeshConnect Payment Interface</h3>
+                <p>Connect to your <strong>Coinbase</strong> account to complete the bonus payment.</p>
+                <button class="btn" onclick="closeInterface()" style="float: right;">✕ Close</button>
+                <div style="clear: both;"></div>
+            </div>
+            <iframe id="meshIframe" class="mesh-iframe" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
+        </div>
+
+        <!-- Portfolio Display -->
+        <div id="portfolioInterface" class="mesh-interface hidden">
+            <div style="text-align: center; margin-bottom: 15px;">
+                <h3>📊 Coinbase Portfolio</h3>
+                <p>Your connected Coinbase account balances and assets.</p>
+                <button class="btn" onclick="refreshPortfolio()" style="float: left;">🔄 Refresh</button>
+                <button class="btn" onclick="closePortfolio()" style="float: right;">✕ Close</button>
+                <div style="clear: both;"></div>
+            </div>
+            <div id="portfolioContent" style="max-height: 500px; overflow-y: auto; padding: 15px; background: white; border-radius: 5px;">
+                <div id="portfolioLoading" class="status info">Loading portfolio data...</div>
+                <div id="portfolioData" style="display: none;"></div>
+            </div>
+        </div>
+
+        <div class="instructions" style="margin-top: 30px;">
+            <h3>💡 Payment Process:</h3>
+            <ul>
+                <li><strong>Coinbase Connection:</strong> Look for "Coinbase" in the exchange/broker list</li>
+                <li><strong>Secure Login:</strong> Use your regular Coinbase credentials (OAuth secure)</li>
+                <li><strong>Account Selection:</strong> Choose the account with sufficient funds</li>
+                <li><strong>Transfer Review:</strong> Review the bonus payment details</li>
+                <li><strong>Execute Payment:</strong> Confirm and complete the transfer</li>
+                <li><strong>Get Confirmation:</strong> Receive transaction hash and completion status</li>
+            </ul>
+            
+            <h3>🔧 Troubleshooting:</h3>
+            <ul>
+                <li><strong>Link token errors:</strong> Ensure you copied the complete token from terminal</li>
+                <li><strong>Interface not loading:</strong> Try "Test Connection" button</li>
+                <li><strong>Can't find Coinbase:</strong> Look for "Coinbase" or "Coinbase Pro"</li>
+                <li><strong>Payment fails:</strong> Check Coinbase account balance and network fees</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function processPayment() {
+            const linkToken = document.getElementById('linkToken').value.trim();
+            const processBtn = document.getElementById('processBtn');
+            
+            if (!linkToken) {
+                showStatus('❌ Please enter a link token first. Run ./bonus-payout.sh to generate one.', 'error');
+                return;
+            }
+
+            try {
+                showStatus('🔄 Processing bonus payment link token...', 'info');
+                processBtn.disabled = true;
+
+                // Decode the base64 link token to get the MeshConnect URL
+                let meshUrl;
+                try {
+                    meshUrl = atob(linkToken);
+                } catch (e) {
+                    throw new Error('Invalid link token format. Please copy the complete token from the bonus-payout.sh output.');
+                }
+
+                // Validate that it's a proper MeshConnect URL
+                if (!meshUrl.startsWith('http') || !meshUrl.includes('meshconnect.com')) {
+                    throw new Error('Decoded token does not appear to be a valid MeshConnect URL.');
+                }
+
+                showStatus('✅ Link token decoded successfully!', 'success');
+                console.log('MeshConnect URL:', meshUrl);
+
+                // Show the MeshConnect interface
+                displayMeshInterface(meshUrl);
+
+            } catch (error) {
+                console.error('Error processing payment:', error);
+                showStatus('❌ Error: ' + error.message, 'error');
+                processBtn.disabled = false;
+            }
+        }
+
+        function displayMeshInterface(meshUrl) {
+            // Try popup first (more reliable)
+            try {
+                const popup = window.open(meshUrl, 'meshconnect', 'width=800,height=600,scrollbars=yes,resizable=yes');
+                
+                if (popup) {
+                    showStatus('🚀 MeshConnect opened in popup window! Complete your payment there.', 'success');
+                    
+                    // Listen for messages from popup
+                    window.addEventListener('message', handleMeshMessage, { once: false });
+                    
+                    // Check if popup is closed
+                    const checkClosed = setInterval(() => {
+                        if (popup.closed) {
+                            clearInterval(checkClosed);
+                            showStatus('Popup closed. If payment was completed, you should see confirmation above.', 'info');
+                            document.getElementById('processBtn').disabled = false;
+                        }
+                    }, 1000);
+                } else {
+                    throw new Error('Popup blocked');
+                }
+            } catch (e) {
+                // Fallback to iframe
+                showStatus('Popup blocked, trying iframe...', 'info');
+                
+                const meshInterface = document.getElementById('meshInterface');
+                const meshIframe = document.getElementById('meshIframe');
+                
+                // Show the interface
+                meshInterface.classList.remove('hidden');
+                
+                // Load MeshConnect in iframe
+                meshIframe.src = meshUrl;
+                
+                showStatus('🚀 MeshConnect interface loaded! Connect to Coinbase to complete the bonus payment.', 'success');
+                
+                // Scroll to the interface
+                meshInterface.scrollIntoView({ behavior: 'smooth' });
+                
+                // Listen for messages from the iframe (for completion status)
+                window.addEventListener('message', handleMeshMessage, { once: false });
+            }
+        }
+
+        function handleMeshMessage(event) {
+            // Security check - only accept messages from MeshConnect domains
+            if (!event.origin.includes('meshconnect.com')) {
+                return;
+            }
+            
+            console.log('Message from MeshConnect:', event.data);
+            
+            try {
+                let data = event.data;
+                if (typeof data === 'string') {
+                    data = JSON.parse(data);
+                }
+                
+                if (data.type === 'TRANSFER_FINISHED' || data.status === 'completed') {
+                    showStatus('🎉 Bonus payment completed successfully! Transaction ID: ' + (data.transactionId || 'N/A'), 'success');
+                    document.getElementById('processBtn').disabled = false;
+                } else if (data.type === 'CONNECTION_SUCCESS' || data.status === 'connected') {
+                    showStatus('✅ Successfully connected to Coinbase! Now review and execute the bonus payment.', 'success');
+                } else if (data.type === 'ERROR' || data.status === 'error') {
+                    showStatus('❌ Error: ' + (data.message || 'Unknown error occurred'), 'error');
+                }
+            } catch (e) {
+                // Non-JSON message, ignore
+                console.log('Non-JSON message from MeshConnect:', event.data);
+            }
+        }
+
+        function closeInterface() {
+            const meshInterface = document.getElementById('meshInterface');
+            const meshIframe = document.getElementById('meshIframe');
+            
+            meshInterface.classList.add('hidden');
+            meshIframe.src = '';
+            
+            document.getElementById('processBtn').disabled = false;
+            showStatus('Payment interface closed.', 'info');
+        }
+
+        function clearAll() {
+            document.getElementById('linkToken').value = '';
+            document.getElementById('status').innerHTML = '';
+            closeInterface();
+            document.getElementById('linkToken').focus();
+        }
+
+        function testConnection() {
+            showStatus('🧪 Testing connection to MeshConnect...', 'info');
+            
+            // Test if we can reach the MeshConnect sandbox
+            fetch('https://sandbox-integration-api.meshconnect.com/', { method: 'HEAD', mode: 'no-cors' })
+                .then(() => {
+                    showStatus('✅ Connection test successful! MeshConnect API is reachable.', 'success');
+                })
+                .catch(() => {
+                    showStatus('⚠️ Connection test completed. If you have issues, check your internet connection.', 'info');
+                });
+        }
+
+        function readPortfolio() {
+            const storedToken = localStorage.getItem('meshAccessToken');
+            
+            if (!storedToken) {
+                showStatus('❌ No Coinbase connection found. Please complete a payment first to connect your account.', 'error');
+                return;
+            }
+            
+            try {
+                const accessToken = JSON.parse(storedToken);
+                showStatus('🔄 Reading portfolio data from Coinbase...', 'info');
+                
+                // Show portfolio interface
+                const portfolioInterface = document.getElementById('portfolioInterface');
+                portfolioInterface.classList.remove('hidden');
+                portfolioInterface.scrollIntoView({ behavior: 'smooth' });
+                
+                // Fetch portfolio data
+                fetchPortfolioData(accessToken);
+                
+            } catch (error) {
+                console.error('Error reading portfolio:', error);
+                showStatus('❌ Error reading stored access token: ' + error.message, 'error');
+            }
+        }
+
+        async function fetchPortfolioData(accessToken) {
+            const portfolioLoading = document.getElementById('portfolioLoading');
+            const portfolioData = document.getElementById('portfolioData');
+            
+            portfolioLoading.style.display = 'block';
+            portfolioData.style.display = 'none';
+            
+            try {
+                // Use MeshConnect API to get account data
+                const response = await fetch('https://sandbox-integration-api.meshconnect.com/api/v1/accounts', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken.accessToken}`,
+                        'Content-Type': 'application/json',
+                        'X-Client-Id': 'a5a361af-8bc9-4bcf-3044-08ddad0c5887' // Your client ID
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+                }
+                
+                const accountData = await response.json();
+                displayPortfolioData(accountData, accessToken);
+                
+            } catch (error) {
+                console.error('Error fetching portfolio:', error);
+                portfolioLoading.innerHTML = `<div class="status error">❌ Error fetching portfolio: ${error.message}</div>`;
+                
+                // Try alternative method - get cached account info
+                displayCachedAccountInfo(accessToken);
+            }
+        }
+
+        function displayPortfolioData(accountData, accessToken) {
+            const portfolioLoading = document.getElementById('portfolioLoading');
+            const portfolioData = document.getElementById('portfolioData');
+            
+            portfolioLoading.style.display = 'none';
+            portfolioData.style.display = 'block';
+            
+            let html = `
+                <div style="margin-bottom: 20px;">
+                    <h4>🏦 Account Information</h4>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                        <strong>Broker:</strong> ${accessToken.brokerName || 'Coinbase'}<br>
+                        <strong>Account:</strong> ${accessToken.accountName || 'N/A'}<br>
+                        <strong>Account ID:</strong> ${accessToken.accountId || 'N/A'}<br>
+                        <strong>Connection Status:</strong> <span style="color: green;">✅ Connected</span>
+                    </div>
+                </div>
+            `;
+            
+            if (accountData && accountData.accounts) {
+                html += `<h4>💰 Account Balances</h4>`;
+                
+                accountData.accounts.forEach((account, index) => {
+                    html += `
+                        <div style="background: white; border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-bottom: 10px;">
+                            <h5 style="margin: 0 0 10px 0; color: #333;">${account.name || `Account ${index + 1}`}</h5>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span><strong>Type:</strong> ${account.type || 'Unknown'}</span>
+                                <span><strong>Currency:</strong> ${account.currency || 'USD'}</span>
+                            </div>
+                            ${account.balance ? `
+                                <div style="margin-top: 10px; font-size: 18px; font-weight: bold; color: #28a745;">
+                                    Balance: ${account.balance} ${account.currency || 'USD'}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                });
+            } else {
+                html += `
+                    <div class="status info">
+                        📊 Portfolio data structure: <pre>${JSON.stringify(accountData, null, 2)}</pre>
+                    </div>
+                `;
+            }
+            
+            portfolioData.innerHTML = html;
+            showStatus('✅ Portfolio data loaded successfully!', 'success');
+        }
+
+        function displayCachedAccountInfo(accessToken) {
+            const portfolioLoading = document.getElementById('portfolioLoading');
+            const portfolioData = document.getElementById('portfolioData');
+            
+            portfolioLoading.style.display = 'none';
+            portfolioData.style.display = 'block';
+            
+            const html = `
+                <div style="margin-bottom: 20px;">
+                    <h4>🏦 Connected Account Information</h4>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+                        <strong>Broker:</strong> ${accessToken.brokerName || 'Coinbase'}<br>
+                        <strong>Account Name:</strong> ${accessToken.accountName || 'N/A'}<br>
+                        <strong>Account ID:</strong> ${accessToken.accountId || 'N/A'}<br>
+                        <strong>Account Type:</strong> ${accessToken.brokerType || 'N/A'}<br>
+                        <strong>Connection Status:</strong> <span style="color: green;">✅ Connected</span>
+                    </div>
+                    <div class="status info">
+                        💡 To view detailed portfolio balances, ensure your account has proper API permissions.
+                        This shows your basic connected account information.
+                    </div>
+                    <div style="background: white; border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-top: 15px;">
+                        <h5>🔑 Access Token Info:</h5>
+                        <pre style="font-size: 12px; background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto;">${JSON.stringify(accessToken, null, 2)}</pre>
+                    </div>
+                </div>
+            `;
+            
+            portfolioData.innerHTML = html;
+            showStatus('✅ Connected account information displayed!', 'success');
+        }
+
+        function refreshPortfolio() {
+            const storedToken = localStorage.getItem('meshAccessToken');
+            
+            if (!storedToken) {
+                showStatus('❌ No Coinbase connection found.', 'error');
+                return;
+            }
+            
+            try {
+                const accessToken = JSON.parse(storedToken);
+                showStatus('🔄 Refreshing portfolio data...', 'info');
+                fetchPortfolioData(accessToken);
+            } catch (error) {
+                showStatus('❌ Error refreshing portfolio: ' + error.message, 'error');
+            }
+        }
+
+        function closePortfolio() {
+            const portfolioInterface = document.getElementById('portfolioInterface');
+            portfolioInterface.classList.add('hidden');
+            showStatus('Portfolio viewer closed.', 'info');
+        }
+
+        function showHelp() {
+            const helpText = `🆘 Bonus Payment Help
+
+📋 How to Process Bonus Payments:
+
+1. 🚀 Start the Application:
+   Run: ./bonus-payout.sh
+   Select option 1 to configure API keys (first time only)
+
+2. 💰 Create Bonus Payout:
+   • Option 3: Single employee bonus
+   • Option 4: Batch payouts from CSV file
+
+3. 📝 Enter Payment Details:
+   • Employee email address
+   • Crypto wallet address
+   • Bonus amount and currency (USDC, USDT, ETH, BTC)
+   • Network (Ethereum, Polygon, BSC)
+   • Payment description
+
+4. 🔗 Complete Payment:
+   • Copy the link token from terminal
+   • Paste it in this web interface
+   • Click "Complete Bonus Payment"
+   • Connect to Coinbase when prompted
+   • Review and execute the transfer
+
+📊 Portfolio Features:
+   • View Coinbase account balances
+   • Check connected account status
+   • Monitor available funds for payments
+   • Refresh data in real-time
+
+💡 Supported Features:
+   • Multi-currency: USDC, USDT, ETH, BTC
+   • Multi-network: Ethereum, Polygon, BSC
+   • Batch payments via CSV import
+   • Portfolio viewing and monitoring
+   • Comprehensive audit logging
+   • Sandbox and production modes
+
+🔧 Need Technical Support?
+   • Check the README.md file
+   • Review logs in logs/ directory
+   • Ensure API credentials are configured
+   • Verify sufficient Coinbase account balance`;
+            
+            alert(helpText);
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        // Auto-focus and setup
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('linkToken').focus();
+            
+            // Auto-detect when link token is pasted
+            document.getElementById('linkToken').addEventListener('paste', function() {
+                setTimeout(function() {
+                    const token = document.getElementById('linkToken').value.trim();
+                    if (token.length > 100) {
+                        showStatus('✅ Link token detected! Click "Complete Bonus Payment" to continue.', 'info');
+                    }
+                }, 100);
+            });
+            
+            showStatus('Ready! Run ./bonus-payout.sh to create a bonus payment, then paste the link token above.', 'info');
+        });
+    </script>
+</body>
+</html> 

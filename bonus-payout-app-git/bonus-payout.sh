@@ -153,10 +153,6 @@ process_single_payout() {
     echo ""
     echo -e "${GREEN}Press Enter to open the web interface to complete your payment...${NC}"
     read
-
-    # Launch the simple HTTP server to host a local server 3001
-    ./serve-web-interface.sh
-    echo "Opening local server 3001"
     
     # Open web interface for payment completion
     echo -e "${CYAN}🌐 Opening web interface...${NC}"
